@@ -52,9 +52,6 @@ namespace ImgProcGrayScale
             Windows.Storage.Streams.IRandomAccessStream random = await Windows.Storage.Streams.RandomAccessStreamReference.CreateFromFile(file).OpenReadAsync();
             Windows.Graphics.Imaging.BitmapDecoder decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(random);
 
-            int nWidthSize = bitmap.PixelWidth;
-            int nHeightSize = bitmap.PixelHeight;
-
             var swBitmap = new SoftwareBitmap(BitmapPixelFormat.Rgba8, bitmap.PixelWidth, bitmap.PixelHeight);
             swBitmap = await decoder.GetSoftwareBitmapAsync();
 
