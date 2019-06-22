@@ -49,17 +49,27 @@ namespace ImgProcGrayScale
             BitmapImage bitmap = new BitmapImage();
             bitmap.SetSource(openFile);
 
+            var swBitmap = await CreateSoftwareBitmap(file, bitmap);
+            ImgProcGrayScale(swBitmap);
+            this.Image.Source = await ConvertToSoftwareBitmapSource(swBitmap);
+        }
+
+        public async Task<SoftwareBitmap> CreateSoftwareBitmap(Windows.Storage.StorageFile file, BitmapImage bitmap)
+        {
             Windows.Storage.Streams.IRandomAccessStream random = await Windows.Storage.Streams.RandomAccessStreamReference.CreateFromFile(file).OpenReadAsync();
             Windows.Graphics.Imaging.BitmapDecoder decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(random);
 
             var swBitmap = new SoftwareBitmap(BitmapPixelFormat.Rgba8, bitmap.PixelWidth, bitmap.PixelHeight);
-            swBitmap = await decoder.GetSoftwareBitmapAsync();
+            return swBitmap = await decoder.GetSoftwareBitmapAsync();
+        }
 
+        public void ImgProcGrayScale(SoftwareBitmap bitmap)
+        {
             int nIdxWidth;
             int nIdxHeight;
             unsafe
             {
-                using (var buffer = swBitmap.LockBuffer(BitmapBufferAccessMode.ReadWrite))
+                using (var buffer = bitmap.LockBuffer(BitmapBufferAccessMode.ReadWrite))
                 using (var reference = buffer.CreateReference())
                 {
                     if (reference is IMemoryBufferByteAccess)
@@ -90,7 +100,6 @@ namespace ImgProcGrayScale
                     }
                 }
             }
-            this.Image.Source = await ConvertToSoftwareBitmapSource(swBitmap);
         }
 
         public async Task<SoftwareBitmapSource> ConvertToSoftwareBitmapSource(SoftwareBitmap bitmap)
